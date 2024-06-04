@@ -4,7 +4,7 @@ CurrentModule = ReactionTest
 
 # ReactionTest
 
-Documentation for [ReactionTest](https://github.com/Alexander-Reimer/ReactionTest.jl).
+Documentation for [ReactionTest](https://github.com/GymnasiumEverstenOldenburg/ReactionTest.jl).
 
 ```@index
 ```

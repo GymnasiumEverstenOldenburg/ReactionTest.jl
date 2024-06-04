@@ -8,7 +8,7 @@ makedocs(;
     authors="Alexander Reimer <alexander.reimer2357@gmail.com> and contributors",
     sitename="ReactionTest.jl",
     format=Documenter.HTML(;
-        canonical="https://Alexander-Reimer.github.io/ReactionTest.jl",
+        canonical="https://GymnasiumEverstenOldenburg.github.io/ReactionTest.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -18,6 +18,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/Alexander-Reimer/ReactionTest.jl",
+    repo="github.com/GymnasiumEverstenOldenburg/ReactionTest.jl",
     devbranch="main",
 )
