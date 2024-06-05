@@ -6,6 +6,10 @@ using GLMakie
 GLMakie.activate!(; focus_on_show=true, float=true, fullscreen=true)
 using FileIO
 using Observables
+using DataFrames
+using CSV
+using Dates
+using Statistics
 
 const ASSETS_PATH = joinpath(@__DIR__, "assets")
 
@@ -19,6 +23,7 @@ struct TestRound
     current_img::Observables.Observable{Matrix}
     img_visible::Observables.Observable{Bool}
     sound_playing::Observables.Observable{Bool}
+    data::DataFrame
 end
 testrunning(tr::TestRound) = tr.img_visible[] || tr.sound_playing[]
 axis(tr::TestRound) = tr.figure.content[1]
@@ -30,16 +35,27 @@ function close_window(tr::TestRound)
 end
 
 function TestRound(name::String, tests::Vector{T}) where {T<:Test}
+    df = DataFrame(;
+        starttime=Float64[],
+        name=String[],
+        testtype=String[],
+        testname=String[],
+        missed=Bool[],
+        reactiontime=Float64[],
+    )
     tr = TestRound(
         name,
         tests,
-        GLMakie.Screen(; resolution=primary_resolution()),
+        GLMakie.Screen(
+        # ; resolution=primary_resolution()
+    ),
         Figure(;
         # resolution=primary_resolution()
     ),
         Observable(Matrix{GLMakie.ColorTypes.RGB}(undef, 100, 100)),
         Observable(false),
         Observable(false),
+        df,
     )
     # empt
     image(tr.figure[1, 1], tr.current_img; visible=tr.img_visible)
@@ -96,11 +112,11 @@ function show(st::SoundTest, tr::TestRound)
     end
 end
 
-testname(test::SoundTest) = "sound"
-testname(test::ImageTest) = "image"
+typename(test::SoundTest) = "sound"
+typename(test::ImageTest) = "image"
 
 whistle_sound = SoundTest("whistle", joinpath(ASSETS_PATH, "whistle-flute-1.wav"))
-penguin_image = ImageTest("Penguin", joinpath(ASSETS_PATH, "penguin.jpg"))
+penguin_image = ImageTest("penguin", joinpath(ASSETS_PATH, "penguin.jpg"))
 
 # from https://discourse.julialang.org/t/makie-figure-resolution-makie-primary-resolution-deprecated/93854/4
 function primary_resolution()
@@ -111,10 +127,20 @@ function primary_resolution()
     return (width, height)
 end
 
+function dataprint(io::IOStream, df::DataFrame; prefix="")
+    println(io, prefix * "Total tests: $(length(df[:, 1]))")
+    println(io, prefix * "Missed tests: $(sum(df.missed))")
+    println(io, prefix * "Average reaction time: $(mean(df.reactiontime))")
+    println(io, prefix * "Median reaction time: $(median(df.reactiontime))")
+    println(io, prefix * "Minimum reaction time: $(minimum(df.reactiontime))")
+    println(io, prefix * "Maximum reaction time: $(maximum(df.reactiontime))")
+    return nothing
+end
+
 function play(tr::TestRound, iters::Int)
     # close_window(tr)
-    sleep(0.5)
-    display(screen(tr), tr.figure)
+    display(tr.figure)
+    sleep(2 + rand() * 4)
     finished = Observable(false)
     on(events(scene(tr)).keyboardbutton) do event
         if event.action == Keyboard.press && event.key == Keyboard.space
@@ -131,7 +157,6 @@ function play(tr::TestRound, iters::Int)
             show(test, tr)
         end
         start_time = time()
-        @info "Started"
         missed = false
         while !finished[]
             sleep(0.00001)
@@ -142,8 +167,44 @@ function play(tr::TestRound, iters::Int)
             end
         end
         stop_time = time()
-        @info "Done: $(stop_time - start_time)"
+        push!(
+            tr.data,
+            (
+                start_time,
+                tr.name,
+                typename(test),
+                test.name,
+                missed,
+                stop_time - start_time,
+            ),
+        )
+        sleep(2 + rand() * 2)
     end
+    filename = joinpath("reactiontest_$(Dates.now())_$(tr.name)")
+    CSV.write(filename * ".csv", tr.data; delim='\t')
+    open(filename * ".txt"; create=true, write=true) do io
+        println(io, "Reaction test result analysis for $(tr.name)")
+        println(io, "All times in seconds unless specified otherwise")
+        println(io, "OVERALL")
+        dataprint(io, tr.data; prefix="\t")
+        for testtype in Set(tr.data.testtype)
+            println(io, "")
+            println(io, "TEST TYPE: $testtype")
+            type_df = tr.data[tr.data.testtype .== testtype, :]
+            testnames = Set(type_df.testname)
+            if length(testnames) <= 1
+                println(io, "\tTest name: $(first(testnames))")
+            end
+            dataprint(io, type_df; prefix="\t")
+            if length(testnames) > 1
+                for testname in testnames
+                    println(io, "\tTEST NAME: $testnames)")
+                    dataprint(io, type_df[type_df.testname .== testname, :]; prefix="\t\t")
+                end
+            end
+        end
+    end
+    return tr.data
 end
 
 end
