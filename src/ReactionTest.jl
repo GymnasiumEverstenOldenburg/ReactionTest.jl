@@ -112,8 +112,8 @@ function show(st::SoundTest, tr::TestRound)
     end
 end
 
-typename(test::SoundTest) = "sound"
-typename(test::ImageTest) = "image"
+typename(test::SoundTest) = "Ton"
+typename(test::ImageTest) = "Bild"
 
 whistle_sound = SoundTest("Pfeife", joinpath(ASSETS_PATH, "whistle-flute-1.wav"))
 penguin_image = ImageTest("Pinguin", joinpath(ASSETS_PATH, "penguin.jpg"))
