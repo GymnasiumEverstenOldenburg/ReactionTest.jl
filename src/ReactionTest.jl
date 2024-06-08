@@ -115,8 +115,8 @@ end
 typename(test::SoundTest) = "sound"
 typename(test::ImageTest) = "image"
 
-whistle_sound = SoundTest("whistle", joinpath(ASSETS_PATH, "whistle-flute-1.wav"))
-penguin_image = ImageTest("penguin", joinpath(ASSETS_PATH, "penguin.jpg"))
+whistle_sound = SoundTest("Pfeife", joinpath(ASSETS_PATH, "whistle-flute-1.wav"))
+penguin_image = ImageTest("Pinguin", joinpath(ASSETS_PATH, "penguin.jpg"))
 
 # from https://discourse.julialang.org/t/makie-figure-resolution-makie-primary-resolution-deprecated/93854/4
 function primary_resolution()
@@ -128,12 +128,12 @@ function primary_resolution()
 end
 
 function dataprint(io::IOStream, df::DataFrame; prefix="")
-    println(io, prefix * "Total tests: $(length(df[:, 1]))")
-    println(io, prefix * "Missed tests: $(sum(df.missed))")
-    println(io, prefix * "Average reaction time: $(mean(df.reactiontime))")
-    println(io, prefix * "Median reaction time: $(median(df.reactiontime))")
-    println(io, prefix * "Minimum reaction time: $(minimum(df.reactiontime))")
-    println(io, prefix * "Maximum reaction time: $(maximum(df.reactiontime))")
+    println(io, prefix * "Gesamtzahl Tests: $(length(df[:, 1]))")
+    println(io, prefix * "Verpasste Tests: $(sum(df.missed))")
+    println(io, prefix * "Durchschnittliche Reaktionszeit: $(mean(df.reactiontime))")
+    println(io, prefix * "Median der Reaktionszeit: $(median(df.reactiontime))")
+    println(io, prefix * "Kleinste Reaktionszeit: $(minimum(df.reactiontime))")
+    println(io, prefix * "Größte Reaktionszeit: $(maximum(df.reactiontime))")
     return nothing
 end
 
@@ -183,22 +183,22 @@ function play(tr::TestRound, iters::Int)
     filename = joinpath("reactiontest_$(Dates.now())_$(tr.name)")
     CSV.write(filename * ".csv", tr.data; delim='\t')
     open(filename * ".txt"; create=true, write=true) do io
-        println(io, "Reaction test result analysis for $(tr.name)")
-        println(io, "All times in seconds unless specified otherwise")
-        println(io, "OVERALL")
+        println(io, "Reaktionszeitanalyse für $(tr.name)")
+        println(io, "Alle Zeiten sind in Sekunden")
+        println(io, "INSGESAMT")
         dataprint(io, tr.data; prefix="\t")
         for testtype in Set(tr.data.testtype)
             println(io, "")
-            println(io, "TEST TYPE: $testtype")
+            println(io, "TESTART: $testtype")
             type_df = tr.data[tr.data.testtype .== testtype, :]
             testnames = Set(type_df.testname)
             if length(testnames) <= 1
-                println(io, "\tTest name: $(first(testnames))")
+                println(io, "\tTestname: $(first(testnames))")
             end
             dataprint(io, type_df; prefix="\t")
             if length(testnames) > 1
                 for testname in testnames
-                    println(io, "\tTEST NAME: $testnames)")
+                    println(io, "\tTESTNAME: $testnames)")
                     dataprint(io, type_df[type_df.testname .== testname, :]; prefix="\t\t")
                 end
             end
