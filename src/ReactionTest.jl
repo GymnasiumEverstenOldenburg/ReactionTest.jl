@@ -183,7 +183,7 @@ function play(tr::TestRound, iters::Int)
                 loading_time,
             ),
         )
-        sleep(1 + rand() * 2)
+        sleep(1.5 + rand() * 2)
     end
     filename = joinpath("reactiontest_$(Dates.now())_$(tr.name)")
     CSV.write(filename * ".csv", tr.data; delim='\t')
