@@ -1,0 +1,7 @@
+{
+    "terminal.integrated.env.linux": {
+        "WAV_PATHS": "$LD_LIBRARY_PATH:/home/alex/.julia/artifacts/d4b056e546bf53a8d95e630978ef5fa1d9758cdf/lib/:/home/alex/.julia/artifacts/94eb32b3203f6059eeb8a2c299e4757acef6032f/lib/:/home/alex/.julia/artifacts/ba0c9ca6ea7017a91892a081bf2186bf537f1ef4/lib:/home/alex/.julia/artifacts/a060c48acc19442c7d69f27469fa408ee6401af2/lib/:/home/alex/.julia/artifacts/89ed5dda220da4354ada1970107e13679914bbbc/lib/",
+        "DL_LOAD_PATH": "$DL_LOAD_PATH:/home/alex/.julia/artifacts/d4b056e546bf53a8d95e630978ef5fa1d9758cdf/lib/:/home/alex/.julia/artifacts/94eb32b3203f6059eeb8a2c299e4757acef6032f/lib/:/home/alex/.julia/artifacts/ba0c9ca6ea7017a91892a081bf2186bf537f1ef4/lib:/home/alex/.julia/artifacts/a060c48acc19442c7d69f27469fa408ee6401af2/lib/:/home/alex/.julia/artifacts/89ed5dda220da4354ada1970107e13679914bbbc/lib/",
+        "LD_LIBRARY_PATH": "$LD_LIBRARY_PATH:/home/alex/.julia/artifacts/d4b056e546bf53a8d95e630978ef5fa1d9758cdf/lib/:/home/alex/.julia/artifacts/94eb32b3203f6059eeb8a2c299e4757acef6032f/lib/:/home/alex/.julia/artifacts/ba0c9ca6ea7017a91892a081bf2186bf537f1ef4/lib:/home/alex/.julia/artifacts/a060c48acc19442c7d69f27469fa408ee6401af2/lib/:/home/alex/.julia/artifacts/89ed5dda220da4354ada1970107e13679914bbbc/lib/:/home/alex/.julia/artifacts/a4478807b246285def6691bb017e74b1ded95ff6/lib/:/home/alex/.julia/artifacts/eff86eedadb59cff1a61399e3242b3f529ca6f59/lib/:/home/alex/.julia/artifacts/0631e2a6a31b5692eec7a575836451b16b734ec0/lib"
+    }
+}

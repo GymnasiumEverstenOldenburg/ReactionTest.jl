@@ -1,6 +1,6 @@
 module ReactionTest
 
-export TestRound, play, whistle_sound, penguin_image
+export TestRound, play, whistle_sound, penguin_image, whistle_edited_sound
 
 using GLMakie
 GLMakie.activate!(; focus_on_show=true, float=true, fullscreen=true)
@@ -116,6 +116,7 @@ typename(test::SoundTest) = "Ton"
 typename(test::ImageTest) = "Bild"
 
 whistle_sound = SoundTest("Pfeife", joinpath(ASSETS_PATH, "whistle-flute-1.wav"))
+whistle_edited_sound = SoundTest("Pfeife (vorne gekürzt)", joinpath(ASSETS_PATH, "whistle-flute-1-edited.wav"))
 penguin_image = ImageTest("Pinguin", joinpath(ASSETS_PATH, "penguin.jpg"))
 
 # from https://discourse.julialang.org/t/makie-figure-resolution-makie-primary-resolution-deprecated/93854/4
@@ -198,7 +199,7 @@ function play(tr::TestRound, iters::Int)
             dataprint(io, type_df; prefix="\t")
             if length(testnames) > 1
                 for testname in testnames
-                    println(io, "\tTESTNAME: $testnames)")
+                    println(io, "\tTESTNAME: $testname")
                     dataprint(io, type_df[type_df.testname .== testname, :]; prefix="\t\t")
                 end
             end
