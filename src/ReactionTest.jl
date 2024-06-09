@@ -18,7 +18,6 @@ abstract type Test end
 struct TestRound
     name::String
     tests::Vector{T where T<:Test}
-    screen::GLMakie.Screen
     figure::Figure
     current_img::Observables.Observable{Matrix}
     img_visible::Observables.Observable{Bool}
@@ -42,13 +41,11 @@ function TestRound(name::String, tests::Vector{T}) where {T<:Test}
         testname=String[],
         missed=Bool[],
         reactiontime=Float64[],
+        loadingtime=Float64[],
     )
     tr = TestRound(
         name,
         tests,
-        GLMakie.Screen(
-        # ; resolution=primary_resolution()
-    ),
         Figure(;
         # resolution=primary_resolution()
     ),
@@ -116,7 +113,10 @@ typename(test::SoundTest) = "Ton"
 typename(test::ImageTest) = "Bild"
 
 whistle_sound = SoundTest("Pfeife", joinpath(ASSETS_PATH, "whistle-flute-1.wav"))
-whistle_edited_sound = SoundTest("Pfeife (vorne gekürzt)", joinpath(ASSETS_PATH, "whistle-flute-1-edited.wav"))
+empty_sound = SoundTest("Nichts", joinpath(ASSETS_PATH, "shortest.wav"))
+whistle_edited_sound = SoundTest(
+    "Pfeife (vorne gekürzt)", joinpath(ASSETS_PATH, "whistle-flute-1-edited.wav")
+)
 penguin_image = ImageTest("Pinguin", joinpath(ASSETS_PATH, "penguin.jpg"))
 
 # from https://discourse.julialang.org/t/makie-figure-resolution-makie-primary-resolution-deprecated/93854/4
@@ -139,7 +139,6 @@ function dataprint(io::IOStream, df::DataFrame; prefix="")
 end
 
 function play(tr::TestRound, iters::Int)
-    # close_window(tr)
     display(tr.figure)
     sleep(2 + rand() * 4)
     finished = Observable(false)
@@ -151,7 +150,11 @@ function play(tr::TestRound, iters::Int)
     for i in 1:iters
         test = rand(tr.tests)
         finished[] = false
+        loading_time = 0
         if test isa SoundTest
+            start_time = time()
+            play(empty_sound.sound)
+            loading_time = time() - start_time
             show(test, tr)
         end
         if test isa ImageTest
@@ -176,16 +179,19 @@ function play(tr::TestRound, iters::Int)
                 typename(test),
                 test.name,
                 missed,
-                stop_time - start_time,
+                stop_time - start_time - loading_time,
+                loading_time,
             ),
         )
-        sleep(2 + rand() * 2)
+        sleep(1 + rand() * 2)
     end
     filename = joinpath("reactiontest_$(Dates.now())_$(tr.name)")
     CSV.write(filename * ".csv", tr.data; delim='\t')
     open(filename * ".txt"; create=true, write=true) do io
         println(io, "Reaktionszeitanalyse für $(tr.name)")
-        println(io, "Alle Zeiten sind in Sekunden")
+        println(
+            io, "Alle Zeiten sind in Sekunden, die Ladezeiten wurden bereits abgezogen."
+        )
         println(io, "INSGESAMT")
         dataprint(io, tr.data; prefix="\t")
         for testtype in Set(tr.data.testtype)
