@@ -208,7 +208,7 @@ function play(tr::TestRound, iters::Int)
             finished[] = true
         end
     end
-    while !finished[]
+    while iters > 0 && !finished[]
         sleep(0.00001)
     end
     finished[] = false
