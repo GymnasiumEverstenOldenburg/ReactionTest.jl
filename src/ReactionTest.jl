@@ -202,14 +202,18 @@ end
 
 function play(tr::TestRound, iters::Int)
     display(tr.figure)
-    if iters > 0
-        sleep(2 + rand() * 2)
-    end
     finished = Observable(false)
     on(events(scene(tr)).keyboardbutton) do event
         if event.action == Keyboard.press && event.key == Keyboard.space
             finished[] = true
         end
+    end
+    while !finished[]
+        sleep(0.00001)
+    end
+    finished[] = false
+    if iters > 0
+        sleep(1 + rand() * 1)
     end
     for i in 1:iters
         test = rand(tr.tests)
