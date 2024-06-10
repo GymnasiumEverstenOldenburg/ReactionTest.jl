@@ -142,53 +142,7 @@ function dataprint(io::IOStream, df::DataFrame; prefix="")
     return nothing
 end
 
-function play(tr::TestRound, iters::Int)
-    display(tr.figure)
-    sleep(2 + rand() * 2)
-    finished = Observable(false)
-    on(events(scene(tr)).keyboardbutton) do event
-        if event.action == Keyboard.press && event.key == Keyboard.space
-            finished[] = true
-        end
-    end
-    for i in 1:iters
-        test = rand(tr.tests)
-        finished[] = false
-        loading_time = 0
-        if test isa SoundTest
-            start_time = time()
-            play(empty_sound.sound)
-            loading_time = time() - start_time
-            show(test, tr)
-        end
-        if test isa ImageTest
-            show(test, tr)
-        end
-        start_time = time()
-        missed = false
-        while !finished[]
-            sleep(0.00001)
-            if time() - start_time >= 2.0
-                @warn "Missed input!"
-                missed = true
-                finished[] = true
-            end
-        end
-        stop_time = time()
-        push!(
-            tr.data,
-            (
-                start_time,
-                tr.name,
-                typename(test),
-                test.name,
-                missed,
-                stop_time - start_time - loading_time,
-                loading_time,
-            ),
-        )
-        sleep(1.5 + rand() * 2)
-    end
+function data_evalutation(tr::TestRound)
     if Sys.iswindows()
         filename = joinpath(
             "..",
@@ -243,7 +197,59 @@ function play(tr::TestRound, iters::Int)
         end
     end
     axislegend(ax)
+    return nothing
+end
 
+function play(tr::TestRound, iters::Int)
+    display(tr.figure)
+    if iters > 0
+        sleep(2 + rand() * 2)
+    end
+    finished = Observable(false)
+    on(events(scene(tr)).keyboardbutton) do event
+        if event.action == Keyboard.press && event.key == Keyboard.space
+            finished[] = true
+        end
+    end
+    for i in 1:iters
+        test = rand(tr.tests)
+        finished[] = false
+        loading_time = 0
+        if test isa SoundTest
+            start_time = time()
+            play(empty_sound.sound)
+            loading_time = time() - start_time
+            show(test, tr)
+        end
+        if test isa ImageTest
+            show(test, tr)
+        end
+        start_time = time()
+        missed = false
+        while !finished[]
+            sleep(0.00001)
+            if time() - start_time >= 2.0
+                @warn "Missed input!"
+                missed = true
+                finished[] = true
+            end
+        end
+        stop_time = time()
+        push!(
+            tr.data,
+            (
+                start_time,
+                tr.name,
+                typename(test),
+                test.name,
+                missed,
+                stop_time - start_time - loading_time,
+                loading_time,
+            ),
+        )
+        sleep(1.5 + rand() * 2)
+    end
+    data_evalutation(tr)
     return filename
 end
 
