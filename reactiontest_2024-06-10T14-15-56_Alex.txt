@@ -1,0 +1,27 @@
+Reaktionszeitanalyse für Alex
+Alle Zeiten sind in Sekunden, die Ladezeiten wurden bereits abgezogen.
+INSGESAMT
+	Gesamtzahl Tests: 5
+	Verpasste Tests: 0
+	Durchschnittliche Reaktionszeit: 0.5019520282745361
+	Median der Reaktionszeit: 0.38962292671203613
+	Kleinste Reaktionszeit: 0.18627214431762695
+	Größte Reaktionszeit: 1.1804919242858887
+
+TESTART: Bild
+	Testname: Pinguin
+	Gesamtzahl Tests: 3
+	Verpasste Tests: 0
+	Durchschnittliche Reaktionszeit: 0.6399499575297037
+	Median der Reaktionszeit: 0.38962292671203613
+	Kleinste Reaktionszeit: 0.3497350215911865
+	Größte Reaktionszeit: 1.1804919242858887
+
+TESTART: Ton
+	Testname: Pfeife (vorne gekürzt)
+	Gesamtzahl Tests: 2
+	Verpasste Tests: 0
+	Durchschnittliche Reaktionszeit: 0.29495513439178467
+	Median der Reaktionszeit: 0.29495513439178467
+	Kleinste Reaktionszeit: 0.18627214431762695
+	Größte Reaktionszeit: 0.4036381244659424

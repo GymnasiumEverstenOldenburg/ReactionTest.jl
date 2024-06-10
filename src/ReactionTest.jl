@@ -15,7 +15,7 @@ const ASSETS_PATH = joinpath(@__DIR__, "assets")
 
 abstract type Test end
 
-struct TestRound
+mutable struct TestRound
     name::String
     tests::Vector{T where T<:Test}
     figure::Figure
@@ -86,7 +86,11 @@ struct Sound
 end
 filepath(sound::Sound) = sound.filepath
 function play(sound::Sound; async=false)
-    cmd = `"C:\\Program Files\\VideoLAN\\VLC\\vlc" "$(filepath(sound))" --play-and-exit --no-interact -Idummy`
+    if Sys.iswindows()
+        cmd = `"C:\\Program Files\\VideoLAN\\VLC\\vlc" "$(filepath(sound))" --play-and-exit --no-interact -Idummy`
+    else
+        cmd = `vlc "$(filepath(sound))" --play-and-exit --no-interact -Idummy`
+    end
     run(cmd; wait=!async)
     return nothing
 end
@@ -140,7 +144,7 @@ end
 
 function play(tr::TestRound, iters::Int)
     display(tr.figure)
-    sleep(2 + rand() * 4)
+    sleep(2 + rand() * 2)
     finished = Observable(false)
     on(events(scene(tr)).keyboardbutton) do event
         if event.action == Keyboard.press && event.key == Keyboard.space
@@ -185,12 +189,21 @@ function play(tr::TestRound, iters::Int)
         )
         sleep(1.5 + rand() * 2)
     end
-    filename = joinpath(
-        "..",
-        "..",
-        "reactiontest_$(Dates.format(Dates.now(), "yyyy-mm-ddTHH-MM-SS"))_$(tr.name)",
-    )
+    if Sys.iswindows()
+        filename = joinpath(
+            "..",
+            "..",
+            "reactiontest_$(Dates.format(Dates.now(), "yyyy-mm-ddTHH-MM-SS"))_$(tr.name)",
+        )
+    else
+        filename = joinpath(
+            "reactiontest_$(Dates.format(Dates.now(), "yyyy-mm-ddTHH-MM-SS"))_$(tr.name)"
+        )
+    end
     CSV.write(filename * ".csv", tr.data; delim='\t')
+    empty!(tr.figure)
+    ax = Axis(tr.figure[1, 1])
+    colors = [:red, :blue, :green, :yellow]
     open(filename * ".txt"; create=true, write=true) do io
         println(io, "Reaktionszeitanalyse für $(tr.name)")
         println(
@@ -198,6 +211,7 @@ function play(tr::TestRound, iters::Int)
         )
         println(io, "INSGESAMT")
         dataprint(io, tr.data; prefix="\t")
+        xcoord = 1
         for testtype in Set(tr.data.testtype)
             println(io, "")
             println(io, "TESTART: $testtype")
@@ -213,8 +227,25 @@ function play(tr::TestRound, iters::Int)
                     dataprint(io, type_df[type_df.testname .== testname, :]; prefix="\t\t")
                 end
             end
+            reactiontimes = type_df.reactiontime
+            avg = mean(reactiontimes)
+            scatter!(
+                ax,
+                [xcoord for i in eachindex(reactiontimes)],
+                reactiontimes;
+                markersize=20,
+                color=colors[xcoord],
+                label=testtype,
+            )
+            scatter!(
+                ax, [xcoord], [avg]; marker=:xcross, markersize=30, color=colors[xcoord]
+            )
+            println("$testtype: x = $xcoord")
+            xcoord += 1
         end
     end
+    axislegend(ax)
+
     return filename
 end
 
