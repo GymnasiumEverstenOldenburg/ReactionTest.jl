@@ -13,4 +13,6 @@ while true
 end
 
 tr = TestRound(name, [penguin_image, whistle_edited_sound])
-play(tr, iterations)
+filename = play(tr, iterations)
+
+run(`notepad $(filename.txt)`)
