@@ -1,0 +1,1 @@
+julia.lnk --project=../../. -ie "include(\"../../compare_sound_image.jl\")"
