@@ -186,7 +186,7 @@ function play(tr::TestRound, iters::Int)
         sleep(1.5 + rand() * 2)
     end
     filename = joinpath(
-        "reactiontest_$(Dates.DateTime(Dates.now(), dateformat"yyyy-mm-dd_hh-mm"))_$(tr.name)",
+        "reactiontest_$(Dates.format(Dates.now(), "yyyy-mm-ddTHH-MM-SS"))_$(tr.name)"
     )
     CSV.write(filename * ".csv", tr.data; delim='\t')
     open(filename * ".txt"; create=true, write=true) do io
