@@ -237,9 +237,7 @@ function play(tr::TestRound, iters::Int)
                 color=colors[xcoord],
                 label=testtype,
             )
-            scatter!(
-                ax, [xcoord], [avg]; marker=:xcross, markersize=30, color=colors[xcoord]
-            )
+            scatter!(ax, [xcoord], [avg]; marker=:xcross, markersize=30, color=black)
             println("$testtype: x = $xcoord")
             xcoord += 1
         end
