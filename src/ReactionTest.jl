@@ -86,7 +86,7 @@ struct Sound
 end
 filepath(sound::Sound) = sound.filepath
 function play(sound::Sound; async=false)
-    cmd = `vlc $(filepath(sound)) --play-and-exit --no-interact -Idummy`
+    cmd = `\"C:\\Program Files\\VideoLAN\\VLC\\vlc $(filepath(sound))\" --play-and-exit --no-interact -Idummy`
     run(cmd; wait=!async)
     return nothing
 end
