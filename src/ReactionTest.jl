@@ -132,9 +132,14 @@ function primary_resolution()
     return (width, height)
 end
 
-function dataprint(io::IOStream, df::DataFrame; prefix="")
-    println(io, prefix * "Gesamtzahl Tests: $(length(df[:, 1]))")
-    println(io, prefix * "Verpasste Tests: $(sum(df.missed))")
+function dataprint(io::IOStream, df::DataFrame; prefix="", num_missed=nothing)
+    if num_missed !== nothing
+        println(io, prefix * "Gesamtzahl Tests: $(length(df[:, 1])+num_missed)")
+        println(io, prefix * "Verpasste Tests: $num_missed")
+    else
+        println(io, prefix * "Gesamtzahl Tests: $(length(df[:, 1]))")
+        println(io, prefix * "Verpasste Tests: $(sum(df.missed))")
+    end
     println(io, prefix * "Durchschnittliche Reaktionszeit: $(mean(df.reactiontime))")
     println(io, prefix * "Median der Reaktionszeit: $(median(df.reactiontime))")
     println(io, prefix * "Kleinste Reaktionszeit: $(minimum(df.reactiontime))")
@@ -142,7 +147,7 @@ function dataprint(io::IOStream, df::DataFrame; prefix="")
     return nothing
 end
 
-function data_evalutation(tr::TestRound)
+function data_evaluation(tr::TestRound)
     if Sys.iswindows()
         filename = joinpath(
             "..",
@@ -169,16 +174,29 @@ function data_evalutation(tr::TestRound)
         for testtype in Set(tr.data.testtype)
             println(io, "")
             println(io, "TESTART: $testtype")
-            type_df = tr.data[tr.data.testtype .== testtype, :]
+            type_df = tr.data[tr.data.testtype .== testtype .&& .!tr.data.missed, :]
+            num_missed = sum(tr.data[tr.data.testtype .== testtype, :missed])
             testnames = Set(type_df.testname)
             if length(testnames) <= 1
                 println(io, "\tTestname: $(first(testnames))")
             end
-            dataprint(io, type_df; prefix="\t")
+            dataprint(io, type_df; prefix="\t", num_missed=num_missed)
             if length(testnames) > 1
                 for testname in testnames
                     println(io, "\tTESTNAME: $testname")
-                    dataprint(io, type_df[type_df.testname .== testname, :]; prefix="\t\t")
+                    name_df = type_df[type_df.testname .== testname, :]
+                    num_missed = sum(
+                        tr.data[
+                            tr.data.testtype .== testtype .&& tr.data.testname .== testname,
+                            :missed,
+                        ],
+                    )
+                    dataprint(
+                        io,
+                        type_df[type_df.testname .== testname, :];
+                        prefix="\t\t",
+                        num_missed=num_missed,
+                    )
                 end
             end
             reactiontimes = type_df.reactiontime
@@ -253,7 +271,7 @@ function play(tr::TestRound, iters::Int)
         )
         sleep(1.5 + rand() * 2)
     end
-    data_evalutation(tr)
+    data_evaluation(tr)
     return filename
 end
 
